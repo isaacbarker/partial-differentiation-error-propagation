@@ -12,45 +12,66 @@ st.set_page_config(
 st.title("Error Propagation")
 
 # Calculator
-st.markdown("### Calculator")
+with st.container(border=True):
+    st.subheader("Calculator")
 
-expression = st.text_input("Function to propagate", placeholder="e.g. 1/2 * g * t**2")
+    expression = st.text_input("Function to propagate errors through, $f$", placeholder="e.g. 1/2 * g * t**2")
 
-# get symbols in expression and request uncertainty data for each
-if expression:
-    f = parse_expr(expression)
+    # get symbols in expression and request uncertainty data for each
+    if expression:
+        f = parse_expr(expression)
 
-    symbols = f.free_symbols
-    symbol_vals = []
-    symbol_uncertainties = []
+        symbols = f.free_symbols
+        symbol_vals = []
+        symbol_uncertainties = []
 
-    for s in symbols:
-        val_input = st.number_input(f"{s}", format="%.5f")
-        symbol_vals.append(val_input)
+        for s in symbols:
+            val_input = st.number_input(f"${s}$", format="%f")
+            symbol_vals.append(val_input)
 
-        uncertainty_input = st.number_input(f"Δ{s} (Leave as 0 for a constant)", format="%.5f")
-        symbol_uncertainties.append(uncertainty_input)
+            uncertainty_input = st.number_input(f"$Δ{s}$ (Leave as 0 for a constant)", format="%f")
+            symbol_uncertainties.append(uncertainty_input)
 
-    calculate = st.button("Calculate")
+        calculate = st.button("Calculate")
 
-    if calculate:
-        # calculate uncertainty
-        uncertainty_squared = 0
-        subs = dict(zip(symbols, symbol_vals))
+        if calculate:
+            # calculate uncertainty
+            uncertainty_squared = [] # evalue as we go
+            uncertainty_equation = 0 # initiate blank expression
+            subs = dict(zip(symbols, symbol_vals))
 
-        for i, s in enumerate(symbols):
-            f_diff_s = sp.diff(f, s)
-            uncertainty_squared += math.pow(abs(f_diff_s.subs(subs).evalf()), 2) * math.pow(symbol_uncertainties[i], 2)
+            for i, s in enumerate(symbols):
+                f_diff_s = sp.diff(f, s)
+                uncertainty_equation += ((f_diff_s) * (parse_expr(f"Δ{s}")))**2
+                uncertainty_squared.append(math.pow(abs(f_diff_s.subs(subs).evalf()), 2) * math.pow(symbol_uncertainties[i], 2))
 
-        value = f.subs(subs)
-        error = math.sqrt(uncertainty_squared)
+            # print error equation
+            st.subheader("Error Equation")
+            st.latex(sp.latex(sp.Eq(
+                parse_expr('Δf**2')
+                , uncertainty_equation
+            )))
 
-        def round_sig(x, sig=3):
-            if x == 0:
-                return 0
-            return round(x, sig - int(math.floor(math.log10(abs(x)))) - 1)
+            # print contributions of each part
+            delim = " + "
+            error_str = delim.join(map(str, uncertainty_squared))
+            st.latex(f"Δf^2 = {error_str}")
+            
+            # calculate values
+            value = f.subs(subs)
+            error = math.sqrt(sum(uncertainty_squared))
 
-        st.markdown(f"Propagated value: **{round_sig(value, 3)} ± {round_sig(error, 1)}**")
+            # format result
+            def round_sig(x, sig=3):
+                if x == 0:
+                    return 0
+                return round(x, sig - int(math.floor(math.log10(abs(x)))) - 1)
+
+            # print result
+            st.subheader("Result")
+            clean_value = ('%f' % value).rstrip('0').rstrip('.')
+            clean_error = ('%f' % round_sig(error, 1)).rstrip('0').rstrip('.')
+            st.latex(f"f = {clean_value} ± {clean_error}") # give result
 
 # How to
 common_functions = {
@@ -82,10 +103,10 @@ st.markdown(df.to_markdown(index=False))
 st.markdown("""
     ### Theory
     This calculator uses the partial differentiation method to propagate errors, assuming the variables are _independent_ of one another.
-    The error in a value T, where T = f(p<sub>i</sub>) can be found with the following formula:
+    The error in a value $f$, where f = $f(p_i)$ can be found with the following formula:
 """, unsafe_allow_html=True)
 st.latex(r"""
-    \Delta T^2 = \sum_{i}^{} \lvert \frac{\partial f(p_i)}{\partial x_i} \rvert ^2  \Delta x_i^2,
+    \Delta f^2 = \sum_{i}^{} \lvert \frac{\partial f(p_i)}{\partial x_i} \rvert ^2  \Delta x_i^2,
 """)
 
 st.markdown("""
