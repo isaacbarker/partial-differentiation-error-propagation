@@ -9,7 +9,7 @@ st.set_page_config(
     page_icon="🔢",
 )
 
-st.title("Error Propagation")
+st.title("🔢 Error Propagation")
 
 # Calculator
 with st.container(border=True):
@@ -109,9 +109,7 @@ st.latex(r"""
     \Delta f^2 = \sum_{i}^{} \lvert \frac{\partial f(p_i)}{\partial x_i} \rvert ^2  \Delta x_i^2,
 """)
 
-st.markdown("""
-    where p<sub>i</sub> represents the parameters of f, and x<sub>i</sub> represents the specific parameter.
-""", unsafe_allow_html=True)
-
-st.text("Code written by Isaac Barker. ")
+st.write("""
+    where $p_i$ represents the parameters of $f$, and $x_i$ represents the specific parameter.
+""")
 
