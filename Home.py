@@ -5,18 +5,21 @@ import os
 
 load_dotenv(find_dotenv())
 
+with st.sidebar:
+    st.write("Code written by [Isaac Barker](https://isaacbarker.net)")
+
 st.set_page_config(
     page_title="Physics Lab Scripts",
-    page_icon="🔬",
+    page_icon=":material/science:",
 )
 
-st.title("🔬 Physics Lab Scripts")
+st.title(":material/science: Physics Lab Scripts")
 st.write("By [Isaac Barker](https://www.isaacbarker.net).")
 
 st.subheader("About")
 st.write("This site provides scripts used for practical physics and physical computing. " \
 "This site uses [streamlit](https://streamlit.io) to convert python programs to web applications. " \
-"**Check out the Git repo [isaacbarker/physics-labs](https://github.com/isaacbarker/physics-labs).**")
+"Check out the Git repo [isaacbarker/physics-labs](https://github.com/isaacbarker/physics-labs).")
 
 st.subheader("Libraries")
 st.write(
@@ -27,7 +30,7 @@ st.write(
 )
 
 # print nasa photo of the day
-@st.cache_data(ttl='1d', persist='disk', show_spinner=True)
+@st.cache_data(ttl='1d')
 def get_photo_of_day():
     return requests.get(f"https://api.nasa.gov/planetary/apod?api_key={os.getenv('NASA_API_KEY')}").json()
 

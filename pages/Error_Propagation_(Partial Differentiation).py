@@ -4,12 +4,15 @@ from sympy.parsing.sympy_parser import parse_expr
 import pandas as pd
 import math
 
+with st.sidebar:
+    st.write("Code written by [Isaac Barker](https://isaacbarker.net)")
+
 st.set_page_config(
     page_title="Error Propagation",
-    page_icon="🔢",
+    page_icon=":material/function:",
 )
 
-st.title("🔢 Error Propagation")
+st.title(":material/function: Error Propagation")
 
 # Calculator
 with st.container(border=True):

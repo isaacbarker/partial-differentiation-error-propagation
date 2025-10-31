@@ -1,3 +1,12 @@
 [theme]
 base="dark"
-primaryColor="#3f66ba"
+backgroundColor="#0f0127ff"
+primaryColor="#7209b7"
+baseRadius = "small"
+linkColor = "#f72585"
+
+
+[theme.sidebar]
+
+backgroundColor="#480ca8"
+textColor = "#daf6ffff"
